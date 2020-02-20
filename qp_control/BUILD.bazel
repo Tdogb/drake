@@ -1,0 +1,45 @@
+# -*- python -*-
+
+load(
+    "@drake//tools/skylark:drake_cc.bzl",
+    "drake_cc_binary",
+    "drake_cc_googletest",
+    "drake_cc_library",
+)
+load("//tools/install:install_data.bzl", "install_data")
+load("//tools/lint:lint.bzl", "add_lint_tests")
+load(
+    "@drake//tools/vector_gen:vector_gen.bzl",
+    "drake_cc_vector_gen_library",
+)
+
+package(default_visibility = ["//visibility:private"])
+
+drake_cc_library(
+    name = "simple_walker",
+    srcs = ["simple_walker.cc"],
+    hdrs = ["simple_walker.h"],
+    deps = [
+        "//common:essential",
+        "//systems/framework:leaf_system",
+    ]
+)
+
+drake_cc_binary(
+    name = "simulate",
+    srcs = ["simulate_simple_walker.cc"],
+    data = ["CompassGait.urdf"],
+    deps = [
+        ":simple_walker",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/parsers",
+        "//attic/multibody/rigid_body_plant:drake_visualizer",
+        "//common:find_resource",
+        "//lcm",
+        "//math:geometric_transform",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram_builder",
+    ]
+)
+
+install_data()
