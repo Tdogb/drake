@@ -1,4 +1,5 @@
 #include <memory>
+#include <iostream>
 
 #include <gflags/gflags.h>
 
@@ -25,13 +26,13 @@ DEFINE_double(target_realtime_rate, 1.0,
 /// command-line arguments.  Run drake-visualizer to watch the results.
 int DoMain() {
   systems::DiagramBuilder<double> builder;
-  auto compass_gait = builder.AddSystem<CompassGait>();
-  compass_gait->set_name("compass_gait");
 
   auto tree = std::make_unique<RigidBodyTree<double>>();
   parsers::urdf::AddModelInstanceFromUrdfFileToWorld(
       FindResourceOrThrow("drake/examples/compass_gait/CompassGait.urdf"),
       multibody::joints::kRollPitchYaw, tree.get());
+  auto compass_gait = builder.AddSystem<CompassGait>();
+  compass_gait->set_name("compass_gait");
 
   {  // Add ramp
     // TODO(russt): Consider moving/reusing this block (useful for all passive

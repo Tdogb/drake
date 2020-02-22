@@ -33,6 +33,7 @@ drake_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
         "//common:default_scalars",
         "//common:essential",
         "//systems/framework:leaf_system",

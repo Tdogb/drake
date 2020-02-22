@@ -22,19 +22,43 @@ drake_cc_library(
     deps = [
         "//common:essential",
         "//systems/framework:leaf_system",
+        "//attic/manipulation/util:sim_diagram_builder",
+        "//attic/multibody:rigid_body_tree_construction",
+    ]
+)
+
+drake_cc_library(
+    name="qp_controller",
+    srcs = ["qp_controller.cc"],
+    hdrs = ["qp_controller.h"],
+    deps = [
+        "//common:essential",
+        "//solvers:mathematical_program",
+        "//systems/controllers:linear_quadratic_regulator",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/systems/controllers:rbt_inverse_dynamics",
+        "//systems/controllers:pid_controller",
+        "//systems/controllers:state_feedback_controller_interface",
+        "//systems/framework:diagram_builder",
+        "//systems/framework:leaf_system",
+        "//systems/primitives:adder",
+        "//systems/primitives:pass_through",
     ]
 )
 
 drake_cc_binary(
     name = "simulate",
     srcs = ["simulate_simple_walker.cc"],
-    data = ["CompassGait.urdf"],
+    data = ["CompassGait.urdf", "KneedCompassGait.urdf"],
     deps = [
         ":simple_walker",
+        ":qp_controller",
         "//attic/multibody:rigid_body_tree",
+        "//systems/controllers:state_feedback_controller_interface",
         "//attic/multibody/parsers",
         "//attic/multibody/rigid_body_plant:drake_visualizer",
         "//common:find_resource",
+        "//systems/controllers:pid_controller",
         "//lcm",
         "//math:geometric_transform",
         "//systems/analysis:simulator",

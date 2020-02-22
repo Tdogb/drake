@@ -1,0 +1,276 @@
+# -*- python -*-
+
+load(
+    "@drake//tools/skylark:drake_cc.bzl",
+    "drake_cc_binary",
+    "drake_cc_library",
+)
+load("//tools/install:install_data.bzl", "install_data")
+load("//tools/lint:lint.bzl", "add_lint_tests")
+load(
+    "@drake//tools/vector_gen:vector_gen.bzl",
+    "drake_cc_vector_gen_library",
+)
+
+package(default_visibility = ["//visibility:private"])
+
+drake_cc_vector_gen_library(
+    name = "Kneed_compass_gait_vector_types",
+    srcs = [
+        "KCG_Input.named_vector",
+        "KneedCompassGait_ContinuousState.named_vector",
+        "KneedCompassGait_Params.named_vector",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# library----------------------------------------------------
+
+drake_cc_library(
+    name = "KCG_common",
+    srcs = ["KCG_common.cpp"],
+    hdrs = [
+        "KCG_common.h",
+        #        "linear_system.h",
+        "util.h",
+    ],
+    data = ["KneedCompassGait.urdf"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":Kneed_compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/parsers",
+        "//math:autodiff",
+        "//math:geometric_transform",
+        "//systems/analysis:simulator",
+        "//systems/primitives:linear_system",
+        "//systems/primitives:signal_logger",
+        "@drake//attic/multibody:rigid_body_tree_construction",
+        "@drake//attic/multibody/rigid_body_plant",
+        "@drake//systems/primitives:constant_vector_source",
+    ],
+)
+
+drake_cc_library(
+    name = "KCG_common1",
+    srcs = ["KCG_common.cpp"],
+    hdrs = [
+        "KCG_common.h",
+        "linear_system.h",
+        "util.h",
+    ],
+    data = ["KneedCompassGait.urdf"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":Kneed_compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/parsers",
+        "//math:autodiff",
+        "//math:geometric_transform",
+        "//systems/analysis:simulator",
+        "//systems/primitives:linear_system",
+        "//systems/primitives:signal_logger",
+        "@drake//attic/multibody:rigid_body_tree_construction",
+        "@drake//attic/multibody/rigid_body_plant",
+        "@drake//systems/primitives:constant_vector_source",
+    ],
+)
+
+drake_cc_library(
+    name = "KCG_common2",
+    srcs = ["multibodyKCG.cpp"],
+    hdrs = [
+        "multibodyKCG.h",
+    ],
+    data = ["KneedCompassGait.urdf"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/parsers",
+        "//multibody/plant",
+        "//systems/primitives:linear_system",
+        "//systems/primitives:signal_logger",
+    ],
+)
+
+drake_cc_library(
+    name = "qpController2",
+    srcs = ["qpController2.cpp"],
+    hdrs = [
+        "qpController2.h",
+        "simulator.h",
+    ],
+    data = [
+        "data.txt",
+        "data2.txt",
+        "data3.txt",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":KCG_common",
+        ":Kneed_compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/rigid_body_plant:contact_results",
+        "//lcm",
+        "//solvers:constraint",
+        "//solvers:gurobi_qp",
+        "//solvers:gurobi_solver",
+        "//solvers:mathematical_program",
+        "//solvers:mathematical_program_result",
+        "//solvers:osqp_solver",
+        "//solvers:solve",
+        "//systems/framework:discrete_values",
+        "//systems/framework:leaf_system",
+        "//systems/framework:vector_system",
+    ],
+)
+
+drake_cc_library(
+    name = "qpControllertest",
+    srcs = ["qpControllertest.cpp"],
+    hdrs = [
+        "qpControllertest.h",
+        "system.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":KCG_common",
+        ":Kneed_compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/rigid_body_plant:contact_results",
+        "//lcm",
+        "//solvers:constraint",
+        "//solvers:gurobi_qp",
+        "//solvers:gurobi_solver",
+        "//solvers:mathematical_program",
+        "//solvers:mathematical_program_result",
+        "//solvers:osqp_solver",
+        "//solvers:solve",
+        "//systems/framework:discrete_values",
+        "//systems/framework:leaf_system",
+        "//systems/framework:vector_system",
+    ],
+)
+
+# binary ---------------------------------------------------------
+drake_cc_binary(
+    name = "rdSimulate",
+    srcs = ["rdSimulate.cpp"],
+    add_test_rule = 1,
+    test_rule_args = ["--target_realtime_rate=0.0"],
+    deps = [
+        ":KCG_common",
+        ":Kneed_compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/parsers",
+        "//attic/multibody/rigid_body_plant:frame_visualizer",
+        "//lcm",
+        "//math:autodiff",
+        "//math:geometric_transform",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram_builder",
+        "@drake//attic/manipulation/util:sim_diagram_builder",
+        "@drake//attic/multibody:rigid_body_tree_construction",
+        "@drake//attic/multibody/rigid_body_plant",
+        "@drake//attic/multibody/rigid_body_plant:drake_visualizer",
+        "@drake//systems/primitives:constant_vector_source",
+        "@gflags",
+    ],
+)
+
+drake_cc_binary(
+    name = "qp_multi_step",
+    srcs = ["qp_multi_step.cpp"],
+    add_test_rule = 1,
+    test_rule_args = ["--target_realtime_rate=0.0"],
+    deps = [
+        ":KCG_common",
+        ":qpController2",
+        "//attic/manipulation/util:sim_diagram_builder",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody:rigid_body_tree_construction",
+        "//attic/multibody/joints",
+        "//attic/multibody/rigid_body_plant",
+        "//attic/multibody/rigid_body_plant:drake_visualizer",
+        "//lcm",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram_builder",
+        "//systems/framework:vector_system",
+        "//systems/primitives:constant_value_source",
+        "//systems/primitives:signal_logger",
+    ],
+)
+
+drake_cc_binary(
+    name = "qp_multi_test",
+    srcs = ["qp_multi_test.cpp"],
+    add_test_rule = 1,
+    test_rule_args = ["--target_realtime_rate=0.0"],
+    deps = [
+        ":KCG_common",
+        ":qpControllertest",
+        "//attic/manipulation/util:sim_diagram_builder",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody:rigid_body_tree_construction",
+        "//attic/multibody/joints",
+        "//attic/multibody/rigid_body_plant",
+        "//attic/multibody/rigid_body_plant:drake_visualizer",
+        "//lcm",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram_builder",
+        "//systems/framework:vector_system",
+        "//systems/primitives:constant_value_source",
+        "//systems/primitives:signal_logger",
+    ],
+)
+
+drake_cc_binary(
+    name = "test",
+    srcs = ["test.cpp"],
+    data = ["KneedCompassGait.urdf"],
+    deps = [
+        ":KCG_common1",
+        ":Kneed_compass_gait_vector_types",
+        "//attic/multibody:rigid_body_tree",
+        "//attic/multibody/parsers",
+        "//attic/multibody/rigid_body_plant:contact_results",
+        "//attic/multibody/rigid_body_plant:drake_visualizer",
+        "//lcm",
+        "//math:geometric_transform",
+        "//multibody/plant:contact_jacobians",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram_builder",
+    ],
+)
+
+drake_cc_binary(
+    name = "qptest",
+    srcs = ["qptest.cpp"],
+    deps = [
+        "//attic/multibody:rigid_body_tree",
+        "//solvers:gurobi_solver",
+        "//solvers:mathematical_program",
+        "//solvers:osqp_solver",
+        "//solvers:solve",
+        "//systems/framework:vector_system",
+        "//systems/primitives:linear_system",
+    ],
+)
+
+drake_cc_binary(
+    name = "doInverseKinematics",
+    srcs = ["doIK.cpp"],
+    deps = [
+        ":KCG_common2",
+        "//geometry:scene_graph",
+        "//lcm:drake_lcm",
+        "//multibody/inverse_kinematics",
+        "//multibody/parsing:parser",
+        "//multibody/plant",
+        "//systems/analysis:simulator",
+    ],
+)
+
+install_data()
+
+add_lint_tests()

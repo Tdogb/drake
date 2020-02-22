@@ -8,6 +8,7 @@
 #include "drake/systems/framework/event.h"
 #include "drake/systems/framework/leaf_system.h"
 #include "drake/systems/framework/scalar_conversion_traits.h"
+#include "drake/multibody/rigid_body_tree.h"
 #include "drake/systems/framework/witness_function.h"
 
 namespace drake {
@@ -119,6 +120,7 @@ class CompassGait final : public systems::LeafSystem<T> {
   ///@}
 
  private:
+  RigidBodyTree<double> tree;
   static const CompassGaitContinuousState<T>& get_continuous_state(
       const systems::ContinuousState<T>& cstate) {
     return dynamic_cast<const CompassGaitContinuousState<T>&>(
