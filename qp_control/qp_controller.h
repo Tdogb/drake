@@ -14,7 +14,13 @@
 namespace drake {
 namespace qp_control {
 
+#define DOF 24
+#define NQ DOF/2
+#define NV DOF/2
+
 using solvers::MathematicalProgram;
+using systems::BasicVector;
+using systems::Context;
 
 template<typename T>
 class QPController : public systems::LeafSystem<T>, 
@@ -22,11 +28,14 @@ class QPController : public systems::LeafSystem<T>,
 {
 private:
     MathematicalProgram prog;
-    std::unique_ptr<RigidBodyTree<T>> tree;
+    RigidBodyTree<T>* tree;
     int estimatedStatePort;
     int desiredStatePort;
     int controlOutputPort;
     void CalcControlOutput(const systems::Context<T>& context, systems::BasicVector<T>* output) const;
+    void DiscreteUpdate(const systems::Context<double> & context, systems::DiscreteValues<double> *state) const;
+    // void DoCalcDiscreteVariableUpdates(const systems::Context<double>& context, const std::vector<const drake::systems::DiscreteUpdateEvent<T>*>&, drake::systems::DiscreteValues<T>* updates) const;
+
 public:
     DRAKE_NO_COPY_NO_MOVE_NO_ASSIGN(QPController);
     QPController(std::unique_ptr<RigidBodyTree<T>> tree_);
@@ -36,7 +45,7 @@ public:
     }
 
     const systems::InputPort<T>& get_input_port_desired_state() const override {
-        return systems::Diagram<T>::get_input_port(0);
+        return systems::Diagram<T>::get_input_port(1);
     }
 
     const systems::OutputPort<T>& get_output_port_control() const override {
