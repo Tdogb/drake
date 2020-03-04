@@ -17,6 +17,11 @@ namespace qp_control {
 #define DOF 24
 #define NQ DOF/2
 #define NV DOF/2
+#define NU 6
+#define DIM 3
+#define ND 4 // friction cone approx
+#define NC 2 // 2 on the left 2 on the right
+#define NF 8 // number of contact force variables
 
 using solvers::MathematicalProgram;
 using systems::BasicVector;
@@ -29,6 +34,7 @@ class QPController : public systems::LeafSystem<T>,
 private:
     MathematicalProgram prog;
     RigidBodyTree<T>* tree;
+
     int estimatedStatePort;
     int desiredStatePort;
     int controlOutputPort;

@@ -69,7 +69,7 @@ namespace qp_control {
         simulator.set_publish_every_time_step(false);
         simulator.get_mutable_context().SetAccuracy(1e-4);
         VectorX<double> zeroState(24);
-        zeroState << -0.9504, 0, 0.95, 0, 0, 0, 0, 0, 0.3300, -1.01, 0.7353, -0.9077, -0.9, 0.30, 0.1245, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+        zeroState << -0.9504, 0, 0.8634, 0, 0, 0, 0, 0, 0.3300, -1.01, 0.7353, -0.9077, -0.9, 0.30, 0.1245, 0, 0, 0, 0, 0, 0, 0, 0, 0;
         plant->set_state_vector(&simulator.get_mutable_context(), zeroState);
         simulator.Initialize();
         simulator.AdvanceTo(1);
